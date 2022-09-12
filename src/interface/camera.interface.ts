@@ -4,9 +4,14 @@ export interface ICamera extends Document {
     readonly username: string;
     readonly password: string;
     readonly warrantyExp ?: string;
-    brand: string;
+    manufacturer: string;
     model: string;
+    serialNumber: number;
+    hardwareId: string;
+    firmwareVersion: string;
+    port?: number;
     createAt: string;
     status: boolean;
+    responseTime?: string;
 }
 

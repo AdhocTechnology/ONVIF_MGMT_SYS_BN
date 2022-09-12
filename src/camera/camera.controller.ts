@@ -1,14 +1,22 @@
-import { Body, Controller, Delete, Get, HttpStatus, OnModuleInit, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, OnModuleInit, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { CreateCameraDto } from '../dto/create-camera.dto';
 import { UpdateCameraDto } from '../dto/update-camera.dto';
-import { CameraService } from './camera.service';
+import { CameraService, NUMBER_OF_LOOP_CHECKING } from './camera.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/onvif.interface';
+import { OnvifService } from '../onvif/onvif.service';
+import { MGetAllDevicesInfo } from '../onvif/onvif.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ICamera } from '../interface/camera.interface';
 // import { CronService } from '../cron/cron.service';
 @UseGuards(JwtAuthGuard)
 @Controller('camera')
-export class CameraController  {
+export class CameraController {
     constructor(
         private readonly cameraService: CameraService,
+        private readonly onvifService: OnvifService,
+        @InjectModel('camera_data') private cameraModel: Model<ICamera>,
         // private readonly cronService: CronService,
     ) {
 
@@ -20,7 +28,7 @@ export class CameraController  {
     //     await this.cronService.setupAllCrons();
     //     // this.cronService.deleteCron('6314d671f15190cecd418650');
     //     // console.log(this.cronService.getAllCronsId());
-        
+
     // }
 
     @Post()
@@ -56,6 +64,88 @@ export class CameraController  {
 
     @Get()
     async getAllCamera(@Res() response) {
+        // const oldCameraData = await this.cameraService.getAllCamera();
+
+        const oldCameraData: MGetAllDevicesInfo[] = await this.cameraService.getUsernamePasswordCamera();
+        
+        // console.time('as');
+        const devicesPromise: Promise<IAllDevicesInfoResponse[]>[] = [];
+        let devices: IAllDevicesInfoResponse[] = [];
+        try {
+            if (oldCameraData.length > 0) {
+                for (let i = 0; i < NUMBER_OF_LOOP_CHECKING; i++) {
+                    devicesPromise.push(this.onvifService.getAllDevicesInfo(oldCameraData));
+                }
+                const res = await Promise.all(devicesPromise);
+                for (let i = 0; i < res.length; i++) {
+                    devices = devices.concat(res[i]);
+                }
+            }
+        } catch (e) {
+            throw new HttpException({
+                reason: 'error.get.all.devices.info',
+                status: HttpStatus.INTERNAL_SERVER_ERROR
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        let responseData: IAllDevicesResponseWithTime;
+        const duplicateIds = devices
+            .map(v => v.ipCamera)
+            .filter((v, i, vIds) => vIds.indexOf(v) !== i)
+        const duplicates = devices
+            .filter(obj => duplicateIds.includes(obj.ipCamera));
+        const filterObj = duplicates.filter((value, index, self) =>
+            index === self.findIndex((t) => (
+                t.ipCamera === value.ipCamera
+            ))
+        );
+        responseData = {
+            devices: filterObj,
+            responseTime: new Date()
+        }
+        if (responseData.devices.length === 0) {
+            responseData = {
+                devices: [],
+                responseTime: new Date()
+            }
+        }
+
+        // console.timeEnd('as');
+        // console.log(responseData);
+
+        const responseDevices: IAllDevicesInfoResponse[] = responseData.devices;
+        const responseTime = responseData.responseTime.toISOString();
+        // mockData
+        // const responseTime = new Date().toISOString();
+        // const responseDevices: IAllDevicesInfoResponse[] = [{
+        //     manufacturer: 'Bosch',
+        //     model: 'DINION IP 4000i IR',
+        //     firmwareVersion: '6.60.0065',
+        //     serialNumber: 404516907622012160,
+        //     hardwareId: 'F000A043',
+        //     ipCamera: '192.255.255.18',
+        //     port: 80
+        // }, {
+        //     manufacturer: 'Bosch',
+        //     model: 'DINION IP 4000i IR',
+        //     firmwareVersion: '6.60.0065',
+        //     serialNumber: 404516907622012160,
+        //     hardwareId: 'F000A043',
+        //     ipCamera: '192.168.2.210',
+        //     port: 80
+        // }];
+
+        const allCameraIp = oldCameraData.map(x => x.ipCamera);
+        const camerasConnected = responseDevices.filter(obj => allCameraIp.includes(obj.ipCamera));
+        await this.cameraModel.updateMany({}, { $set: { status: false } });
+        for (let i = 0; i < camerasConnected.length; i++) {
+            camerasConnected[i].status = true;
+            camerasConnected[i].responseTime = responseTime;
+            const filter = { ipCamera: camerasConnected[i].ipCamera };
+            const update = camerasConnected[i];
+            await this.cameraModel.findOneAndUpdate(filter, update);
+        }
+
         try {
             const cameraData = await this.cameraService.getAllCamera();
             return response.status(HttpStatus.OK).json({

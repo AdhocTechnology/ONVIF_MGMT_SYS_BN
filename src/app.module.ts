@@ -17,6 +17,8 @@ import { CronService } from './cron/cron.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HistoryCameraService } from './history_camera/history_camera.service';
 import { HistoryCameraSchema } from './schema/history_camera.schema';
+import { OnvifService } from './onvif/onvif.service';
+import { OnvifController } from './onvif/onvif.controller';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -30,7 +32,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     AuthModule,
     ScheduleModule.forRoot()
   ],
-  controllers: [AppController, CameraController, SchedulerController],
-  providers: [AppService, CameraService, SchedulerService, CronService, HistoryCameraService],
+  controllers: [AppController, CameraController, SchedulerController,OnvifController],
+  providers: [AppService, CameraService, SchedulerService, CronService, HistoryCameraService,OnvifService],
 })
 export class AppModule { }

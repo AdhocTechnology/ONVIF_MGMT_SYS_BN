@@ -8,13 +8,23 @@ export class Camera {
    @Prop()
    password: string;
    @Prop()
-   warrantyExp : string;
+   warrantyExp: string;
    @Prop()
    status: boolean;
    @Prop()
    model: string;
    @Prop()
-   brand: string;
+   manufacturer: string;
+   @Prop()
+   serialNumber: number;
+   @Prop()
+   hardwareId: string;
+   @Prop()
+   firmwareVersion: string;
+   @Prop()
+   port?: number;
+   @Prop()
+   responseTime?: string;
    @Prop()
    createAt: Date;
 }

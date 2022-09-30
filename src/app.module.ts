@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-
 import { CameraSchema } from './schema/camera.schema';
 import { CameraService } from './camera/camera.service';
 import { CameraController } from './camera/camera.controller';
@@ -19,20 +20,40 @@ import { HistoryCameraService } from './history_camera/history_camera.service';
 import { HistoryCameraSchema } from './schema/history_camera.schema';
 import { OnvifService } from './onvif/onvif.service';
 import { OnvifController } from './onvif/onvif.controller';
+
+import { Camera } from './camera/camera.entity';
+import { Scheduler } from './scheduler/scheduler.entity';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
     ConfigModule.forRoot({envFilePath,isGlobal: true,}),
-    MongooseModule.forRoot('mongodb://localhost/ONVIF_SYS'),
-    MongooseModule.forFeature([{ name: 'camera_data', schema: CameraSchema }, { name: 'scheduler_data', schema: SchedulerSchema },
-    , { name: 'history_camera_data', schema: HistoryCameraSchema }
-  ]),
-    // MongooseModule.forRoot('mongodb://localhost:27017',{dbName: 'ONVIF_SYS'}),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'onvif_db',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+    
     UsersModule,
     AuthModule,
+    TypeOrmModule.forFeature([Camera,Scheduler]),
     ScheduleModule.forRoot()
   ],
-  controllers: [AppController, CameraController, SchedulerController,OnvifController],
-  providers: [AppService, CameraService, SchedulerService, CronService, HistoryCameraService,OnvifService],
+  controllers: [
+    AppController, CameraController, 
+    SchedulerController,
+    OnvifController
+  ],
+  providers: [
+    AppService, CameraService, 
+    SchedulerService,
+     CronService, 
+    // HistoryCameraService,
+    OnvifService
+  ],
 })
 export class AppModule { }

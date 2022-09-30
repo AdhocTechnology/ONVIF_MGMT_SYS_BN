@@ -62,37 +62,37 @@ export class OnvifController {
     //     return response;
     // }
 
-    @Post('/connection')
-    async getConnectStatus(@Body() body: MGetConnectionStatus): Promise<ICheckConnect> {
-        console.time('checkConnection');
-        const mapBody: IGetAllDevicesInfo[] = [];
-        mapBody.push(body);
-        let deviceInfo: IAllDevicesInfoResponse[] = [];
-        let isReturn: boolean = false;
-        try {
-            deviceInfo = await this.onvifService.getAllDevicesInfo(mapBody);
-            if (deviceInfo.length !== 0) {
-                isReturn = true;
-            }
-        } catch (e) {
-            throw new HttpException({
-                reason: 'error.get.connection',
-                status: HttpStatus.INTERNAL_SERVER_ERROR
-            }, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        let response: ICheckConnect;
-        if (isReturn) {
-            response = {
-                status: CameraStatus.connected,
-                devices: deviceInfo[0]
-            }
-        } else {
-            response = {
-                status: CameraStatus.canTConnect,
-            }
-        }
-        console.timeEnd('checkConnection');
-        return response;
-    }
+    // @Post('/connection')
+    // async getConnectStatus(@Body() body: MGetConnectionStatus): Promise<ICheckConnect> {
+    //     console.time('checkConnection');
+    //     const mapBody: IGetAllDevicesInfo[] = [];
+    //     mapBody.push(body);
+    //     let deviceInfo: IAllDevicesInfoResponse[] = [];
+    //     let isReturn: boolean = false;
+    //     try {
+    //         deviceInfo = await this.onvifService.getAllDevicesInfo(mapBody);
+    //         if (deviceInfo.length !== 0) {
+    //             isReturn = true;
+    //         }
+    //     } catch (e) {
+    //         throw new HttpException({
+    //             reason: 'error.get.connection',
+    //             status: HttpStatus.INTERNAL_SERVER_ERROR
+    //         }, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    //     let response: ICheckConnect;
+    //     if (isReturn) {
+    //         response = {
+    //             status: CameraStatus.connected,
+    //             devices: deviceInfo[0]
+    //         }
+    //     } else {
+    //         response = {
+    //             status: CameraStatus.canTConnect,
+    //         }
+    //     }
+    //     console.timeEnd('checkConnection');
+    //     return response;
+    // }
 
 }

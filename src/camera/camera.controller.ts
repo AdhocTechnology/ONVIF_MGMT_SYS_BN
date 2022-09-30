@@ -6,9 +6,12 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/onvif.interface';
 import { OnvifService } from '../onvif/onvif.service';
 import { MGetAllDevicesInfo } from '../onvif/onvif.model';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+// import { InjectModel } from '@nestjs/mongoose';
+// import { Model } from 'mongoose';
 import { ICamera } from '../interface/camera.interface';
+
+import { Camera } from './camera.entity';
+
 // import { CronService } from '../cron/cron.service';
 @UseGuards(JwtAuthGuard)
 @Controller('camera')
@@ -16,23 +19,14 @@ export class CameraController {
     constructor(
         private readonly cameraService: CameraService,
         private readonly onvifService: OnvifService,
-        @InjectModel('camera_data') private cameraModel: Model<ICamera>,
+        // @InjectModel('camera_data') private cameraModel: Model<ICamera>,
         // private readonly cronService: CronService,
     ) {
 
-
-
     }
 
-    // async onModuleInit() {
-    //     await this.cronService.setupAllCrons();
-    //     // this.cronService.deleteCron('6314d671f15190cecd418650');
-    //     // console.log(this.cronService.getAllCronsId());
-
-    // }
-
     @Post()
-    async createCamera(@Res() response, @Body() createCameraDto: CreateCameraDto) {
+    async createCamera(@Res() response, @Body() createCameraDto: CreateCameraDto): Promise<Camera> {
         try {
             const newCamera = await this.cameraService.createCamera(createCameraDto);
             return response.status(HttpStatus.CREATED).json({
@@ -41,15 +35,11 @@ export class CameraController {
             });
         } catch (err) {
             return response.status(err.status).json(err.response);
-            // return response.status(HttpStatus.BAD_REQUEST).json({
-            //     statusCode: 400,
-            //     message: 'Error: Camera not created!',
-            //     error: 'Bad Request'
-            // });
         }
     }
+
     @Put('/:id')
-    async updateCamera(@Res() response, @Param('id') cameraId: string,
+    async updateCamera(@Res() response, @Param('id') cameraId: number,
         @Body() updateCameraDto: UpdateCameraDto) {
         try {
             const existingCamera = await this.cameraService.updateCamera(cameraId, updateCameraDto);
@@ -67,8 +57,8 @@ export class CameraController {
         // const oldCameraData = await this.cameraService.getAllCamera();
 
         const oldCameraData: MGetAllDevicesInfo[] = await this.cameraService.getUsernamePasswordCamera();
-        
-        // console.time('as');
+        // console.log(oldCameraData);
+
         const devicesPromise: Promise<IAllDevicesInfoResponse[]>[] = [];
         let devices: IAllDevicesInfoResponse[] = [];
         try {
@@ -110,7 +100,6 @@ export class CameraController {
             }
         }
 
-        // console.timeEnd('as');
         // console.log(responseData);
 
         const responseDevices: IAllDevicesInfoResponse[] = responseData.devices;
@@ -137,13 +126,15 @@ export class CameraController {
 
         const allCameraIp = oldCameraData.map(x => x.ipCamera);
         const camerasConnected = responseDevices.filter(obj => allCameraIp.includes(obj.ipCamera));
-        await this.cameraModel.updateMany({}, { $set: { status: false } });
+
+        await this.cameraService.clearStatus();
+
         for (let i = 0; i < camerasConnected.length; i++) {
             camerasConnected[i].status = true;
             camerasConnected[i].responseTime = responseTime;
             const filter = { ipCamera: camerasConnected[i].ipCamera };
             const update = camerasConnected[i];
-            await this.cameraModel.findOneAndUpdate(filter, update);
+            await this.cameraService.findOneAndUpdate(filter, update);
         }
 
         try {
@@ -155,8 +146,10 @@ export class CameraController {
             return response.status(err.status).json(err.response);
         }
     }
+
+
     @Get('/:id')
-    async getCamera(@Res() response, @Param('id') cameraId: string) {
+    async getCamera(@Res() response, @Param('id') cameraId: number) {
         try {
             const existingCamera = await
                 this.cameraService.getCamera(cameraId);
@@ -167,13 +160,15 @@ export class CameraController {
             return response.status(err.status).json(err.response);
         }
     }
+
+
     @Delete('/:id')
-    async deleteCamera(@Res() response, @Param('id') cameraId: string) {
+    async deleteCamera(@Res() response, @Param('id') cameraId: number) {
         try {
             const deletedCamera = await this.cameraService.deleteCamera(cameraId);
             return response.status(HttpStatus.OK).json({
                 message: 'Camera deleted successfully',
-                deletedCamera,
+                // deletedCamera,
             });
         } catch (err) {
             return response.status(err.status).json(err.response);

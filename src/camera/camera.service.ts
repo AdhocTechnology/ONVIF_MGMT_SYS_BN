@@ -6,105 +6,96 @@ import { Model } from "mongoose";
 import { UpdateCameraDto } from '../dto/update-camera.dto';
 import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/onvif.interface';
 import { OnvifService } from '../onvif/onvif.service';
-
-
+import { Camera } from './camera.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 export const NUMBER_OF_LOOP_CHECKING: number = 3;
 
 @Injectable()
 export class CameraService {
     constructor(
-        @InjectModel('camera_data')
-        private cameraModel: Model<ICamera>,
-        private onvifService: OnvifService,
-    ) { }
-    async createCamera(createCameraDto: CreateCameraDto): Promise<ICamera> {
-        const newCamera = await new this.cameraModel(createCameraDto);
-        const existingCamera = await this.cameraModel.findOne({ ipCamera: newCamera.ipCamera });
+        // @InjectModel('camera_data')
+        // private cameraModel: Model<ICamera>,
+        // private onvifService: OnvifService,
 
+        @InjectRepository(Camera)
+        private readonly cemeraRepository: Repository<Camera>
+    ) { }
+
+    async createCamera(createCameraDto: CreateCameraDto): Promise<Camera> {
+        const existingCamera = await this.cemeraRepository.findOneBy({ ipCamera: createCameraDto.ipCamera });
         if (existingCamera) {
             throw new ConflictException(`camera is already exist`);
         }
+        const newCamera = new Camera();
+        newCamera.ipCamera = createCameraDto.ipCamera;
+        newCamera.username = createCameraDto.username;
+        newCamera.password = createCameraDto.password;
+        newCamera.warrantyExp = createCameraDto.warrantyExp;
         newCamera.status = false;
         newCamera.model = '-';
         newCamera.createAt = new Date().toISOString();
-        return newCamera.save();
+        return this.cemeraRepository.save(newCamera);
     }
-    async updateCamera(cameraId: string, updateCameraDto: UpdateCameraDto): Promise<ICamera> {
-        const existingCamera = await this.cameraModel.findByIdAndUpdate(cameraId, updateCameraDto, { new: true });
+
+    async updateCamera(cameraId: number, updateCameraDto: UpdateCameraDto): Promise<Camera> {
+        const existingCamera = await this.cemeraRepository.findOneBy({ id: cameraId });
         if (!existingCamera) {
             throw new NotFoundException(`camera #${cameraId} not found`);
         }
-        return existingCamera;
+        await this.cemeraRepository.update({ id: cameraId }, updateCameraDto);
+        return await this.cemeraRepository.findOneBy({ id: cameraId });
     }
-    async getAllCamera(): Promise<ICamera[]> {
-        const cameraData = await this.cameraModel.find();
+
+    async findOneAndUpdate(where: object, updateCameraDto: UpdateCameraDto): Promise<Camera> {
+        const existingCamera = await this.cemeraRepository.findOneBy(where);
+        if (!existingCamera) {
+            throw new NotFoundException(`camera not found`);
+        }
+        await this.cemeraRepository.update(where, updateCameraDto);
+        return await this.cemeraRepository.findOneBy(where);
+    }
+
+
+
+    async clearStatus(): Promise<void> {
+        await this.cemeraRepository.update({}, {status:false});
+    }
+
+    async getAllCamera(): Promise<Camera[]> {
+        const cameraData = await this.cemeraRepository.find();
         if (!cameraData || cameraData.length == 0) {
             throw new NotFoundException('Camera data not found!');
         }
         return cameraData;
     }
-    async getUsernamePasswordCamera(): Promise<ICamera[]> {
+
+    async getUsernamePasswordCamera(): Promise<Camera[]> {
         // username
         // password
-        const cameraData = await this.cameraModel.find({}).select(['ipCamera','username','password']);
+        
+        const cameraData = await this.cemeraRepository.createQueryBuilder('c').select(['c.ipCamera', 'c.username', 'c.password']).getMany();
         if (!cameraData || cameraData.length == 0) {
             throw new NotFoundException('Camera data not found!');
         }
         return cameraData;
     }
-    async getCamera(cameraId: string): Promise<ICamera> {
-        const existingCamera = await this.cameraModel.findById(cameraId).exec();
+
+    async getCamera(cameraId: number): Promise<Camera> {
+        const existingCamera = await this.cemeraRepository.findOneBy({ id: cameraId });
         if (!existingCamera) {
             throw new NotFoundException(`Camera #${cameraId} not found`);
         }
         return existingCamera;
     }
-    async deleteCamera(cameraId: string): Promise<ICamera> {
-        const deletedCamera = await this.cameraModel.findByIdAndDelete(cameraId);
+
+    async deleteCamera(cameraId: number): Promise<void> {
+        const deletedCamera = await this.cemeraRepository.findOneBy({ id: cameraId });
         if (!deletedCamera) {
             throw new NotFoundException(`Camera #${cameraId} not found`);
         }
-        return deletedCamera;
+        await this.cemeraRepository.delete(cameraId);
     }
 
-    // async updateAllCameraStatus(curData: MGetAllDevicesInfo[]) {
-    //     const devicesPromise: Promise<IAllDevicesInfoResponse[]>[] = [];
-    //     let devices: IAllDevicesInfoResponse[] = [];
-    //     try {
-    //         for (let i = 0; i < NUMBER_OF_LOOP_CHECKING; i++) {
-    //             devicesPromise.push(this.onvifService.getAllDevicesInfo(curData));
-    //         }
-    //         const res = await Promise.all(devicesPromise);
-    //         for (let i = 0; i < res.length; i++) {
-    //             devices = devices.concat(res[i]);
-    //         }
-    //     } catch (e) {
-    //         throw new HttpException({
-    //             reason: 'error.get.all.devices.info',
-    //             status: HttpStatus.INTERNAL_SERVER_ERROR
-    //         }, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
 
-    //     let response: IAllDevicesResponseWithTime;
-    //     const duplicateIds = devices
-    //         .map(v => v.ipCamera)
-    //         .filter((v, i, vIds) => vIds.indexOf(v) !== i)
-    //     const duplicates = devices
-    //         .filter(obj => duplicateIds.includes(obj.ipCamera));
-    //     const filterObj = duplicates.filter((value, index, self) =>
-    //         index === self.findIndex((t) => (
-    //             t.ipCamera === value.ipCamera
-    //         ))
-    //     );
-    //     response = {
-    //         devices: filterObj,
-    //         responseTime: new Date()
-    //     }
-    //     if (response.devices.length === 0) {
-    //         response = {
-    //             devices: []
-    //         }
-    //     }
-    //     return response;
-    // }
 }

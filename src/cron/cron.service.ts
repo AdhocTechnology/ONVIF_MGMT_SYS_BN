@@ -11,6 +11,11 @@ import { MGetAllDevicesInfo } from '../onvif/onvif.model';
 import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/onvif.interface';
 import { OnvifService } from '../onvif/onvif.service';
 import { ICamera } from '../interface/camera.interface';
+import { Scheduler } from '../scheduler/scheduler.entity';
+import { Camera } from '../camera/camera.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
 @Injectable()
 export class CronService {
     constructor(
@@ -18,8 +23,10 @@ export class CronService {
         private readonly historyCameraService: HistoryCameraService,
         private readonly cameraService: CameraService,
         private readonly onvifService: OnvifService,
-        @InjectModel('scheduler_data') private schedulerModel: Model<IScheduler>,
-        @InjectModel('camera_data') private cameraModel: Model<ICamera>,
+        @InjectRepository(Scheduler)
+        private readonly schedulerRepository: Repository<Scheduler>,
+        @InjectRepository(Camera)
+        private readonly cameraRepository: Repository<Camera>
     ) {
     }
 
@@ -27,7 +34,7 @@ export class CronService {
         const SchedulerArr = await this.getAllScheduler();
         SchedulerArr.forEach((element, i) => {
             // console.log(`count ${i}`);
-            this.addCronJob(element._id, element.timeHr, element.timeMin);
+            this.addCronJob(element.id, element.timeHr, element.timeMin);
         });
     }
 
@@ -45,19 +52,17 @@ export class CronService {
 
     }
 
-    async getAllScheduler(): Promise<IScheduler[]> {
-        const schedulerData = await this.schedulerModel.find();
+    async getAllScheduler(): Promise<Scheduler[]> {
+        const schedulerData = await this.schedulerRepository.find();
         if (!schedulerData || schedulerData.length == 0) {
             throw new NotFoundException('Scheduler data not found!');
         }
         return schedulerData;
     }
 
-    addCronJob(_id: string, hour: string, min: string) {
+    addCronJob(_id: number, hour: string, min: string) {
         const job = new CronJob(`0 ${min} ${hour} * * *`, async () => {
             console.log('keep log');
-
-
             const oldCameraData: MGetAllDevicesInfo[] = await this.cameraService.getUsernamePasswordCamera();
             const devicesPromise: Promise<IAllDevicesInfoResponse[]>[] = [];
             let devices: IAllDevicesInfoResponse[] = [];
@@ -120,24 +125,14 @@ export class CronService {
             // }];
             const allCameraIp = oldCameraData.map(x => x.ipCamera);
             const camerasConnected = responseDevices.filter(obj => allCameraIp.includes(obj.ipCamera));
-            await this.cameraModel.updateMany({}, { $set: { status: false } });
+            await this.cameraService.clearStatus();
             for (let i = 0; i < camerasConnected.length; i++) {
                 camerasConnected[i].status = true;
                 camerasConnected[i].responseTime = responseTime;
                 const filter = { ipCamera: camerasConnected[i].ipCamera };
                 const update = camerasConnected[i];
-                await this.cameraModel.findOneAndUpdate(filter, update);
+                await this.cameraService.findOneAndUpdate(filter, update);
             }
-
-
-
-
-
-
-
-
-
-
 
 
             const allCameraData = await this.cameraService.getAllCamera();
@@ -153,9 +148,9 @@ export class CronService {
         job.start();
     }
 
-    deleteCron(name: string) {
+    deleteCron(name: number) {
         try {
-            this.schedulerRegistry.deleteCronJob(name);
+            this.schedulerRegistry.deleteCronJob(name.toString());
         } catch (error) {
             console.log(error);
         }

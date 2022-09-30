@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 export class Camera {
    @Prop()
    ipCamera: string;
-   @Prop()
+   @Prop() 
    username: string;
    @Prop()
    password: string;

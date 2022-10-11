@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class HistoryCamera {
     @PrimaryGeneratedColumn()
-    id: number;
+    id?: number;
     @Column()
     ipCamera: string;
     @Column()
@@ -29,5 +29,8 @@ export class HistoryCamera {
     @Column()
     responseTime?: string;
     @Column()
-    createAt: string;
+    timeHr?: string;
+    @Column()
+    timeMin?: string;
+    
 }

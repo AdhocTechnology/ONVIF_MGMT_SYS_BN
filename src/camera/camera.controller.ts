@@ -112,7 +112,7 @@ export class CameraController {
         //     firmwareVersion: '6.60.0065',
         //     serialNumber: 404516907622012160,
         //     hardwareId: 'F000A043',
-        //     ipCamera: '192.255.255.18',
+        //     ipCamera: '192.168.1.255',
         //     port: 80
         // }, {
         //     manufacturer: 'Bosch',
@@ -120,7 +120,7 @@ export class CameraController {
         //     firmwareVersion: '6.60.0065',
         //     serialNumber: 404516907622012160,
         //     hardwareId: 'F000A043',
-        //     ipCamera: '192.168.2.210',
+        //     ipCamera: '192.255.255.12',
         //     port: 80
         // }];
 

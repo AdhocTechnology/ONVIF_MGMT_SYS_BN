@@ -112,7 +112,7 @@ export class CronService {
             //     firmwareVersion: '6.60.0065',
             //     serialNumber: 404516907622012160,
             //     hardwareId: 'F000A043',
-            //     ipCamera: '192.255.255.18',
+            //     ipCamera: '192.255.255.12',
             //     port: 80
             // }, {
             //     manufacturer: 'Bosch',
@@ -134,7 +134,6 @@ export class CronService {
                 await this.cameraService.findOneAndUpdate(filter, update);
             }
 
-
             const allCameraData = await this.cameraService.getAllCamera();
             await this.historyCameraService.createHistoryCamera(allCameraData, hour, min);
         });
@@ -144,7 +143,7 @@ export class CronService {
             console.log(error);
         }
 
-        console.log(`job ${_id} added !`);
+        console.log(`job ${_id} added !(${hour}:${min})`);
         job.start();
     }
 

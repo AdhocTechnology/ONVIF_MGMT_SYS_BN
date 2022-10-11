@@ -9,19 +9,25 @@ import { Camera } from '../camera/camera.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
-export class HistoryCameraService { 
+export class HistoryCameraService {
     constructor(
         @InjectRepository(HistoryCamera)
         private readonly historyCameraRepository: Repository<HistoryCamera>
     ) { }
-    async createHistoryCamera(historyCameraData: Camera[], timeHr: string, timeMin: string): Promise<HistoryCamera> {
+    async createHistoryCamera(historyCameraData: Camera[], timeHr: string, timeMin: string): Promise<void> {
 
-        // let newHistoryCameraDto = {} as IHistoryCamera;
-        // newHistoryCameraDto.cameras = historyCameraData;
-        // newHistoryCameraDto._uuid = new Date().toLocaleDateString() + `/${timeHr}/${timeMin}`;
-        // newHistoryCameraDto.createAt = new Date().toISOString();
-        // const newHistoryCamera = new this.historyCameraModel(newHistoryCameraDto);
-        // return newHistoryCamera.save();
+        historyCameraData.forEach((camera, i) => {
+            try {
+                const { id, createAt, ...data } = camera;
+                let newHistoryCamera = new HistoryCamera();
+                newHistoryCamera = data;
+                newHistoryCamera.timeHr = timeHr.replace(/^0+/, '');
+                newHistoryCamera.timeMin = timeMin.replace(/^0+/, '');
+                this.historyCameraRepository.save(newHistoryCamera);
+            } catch (error) {
+                console.log(error);
+            }
+        });
     }
 
 

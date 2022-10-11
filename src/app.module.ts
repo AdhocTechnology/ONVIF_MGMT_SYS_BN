@@ -23,10 +23,11 @@ import { OnvifController } from './onvif/onvif.controller';
 
 import { Camera } from './camera/camera.entity';
 import { Scheduler } from './scheduler/scheduler.entity';
+import { HistoryCamera } from './history_camera/history_camera.entity';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
-    ConfigModule.forRoot({envFilePath,isGlobal: true,}),
+    ConfigModule.forRoot({ envFilePath, isGlobal: true, }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -37,22 +38,22 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
       autoLoadEntities: true,
       synchronize: true,
     }),
-    
+
     UsersModule,
     AuthModule,
-    TypeOrmModule.forFeature([Camera,Scheduler]),
+    TypeOrmModule.forFeature([Camera, Scheduler,HistoryCamera]),
     ScheduleModule.forRoot()
   ],
   controllers: [
-    AppController, CameraController, 
+    AppController, CameraController,
     SchedulerController,
     OnvifController
   ],
   providers: [
-    AppService, CameraService, 
+    AppService, CameraService,
     SchedulerService,
-     CronService, 
-    // HistoryCameraService,
+    CronService,
+    HistoryCameraService,
     OnvifService
   ],
 })

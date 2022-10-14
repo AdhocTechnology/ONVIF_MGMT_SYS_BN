@@ -19,11 +19,13 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HistoryCameraService } from './history_camera/history_camera.service';
 import { HistoryCameraSchema } from './schema/history_camera.schema';
 import { OnvifService } from './onvif/onvif.service';
+import { ChangedCameraService } from './changedCamera/changedCamera.service';
 import { OnvifController } from './onvif/onvif.controller';
 
 import { Camera } from './camera/camera.entity';
 import { Scheduler } from './scheduler/scheduler.entity';
 import { HistoryCamera } from './history_camera/history_camera.entity';
+import { ChangedCamera } from './changedCamera/changedCamera.entity';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -41,7 +43,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
     UsersModule,
     AuthModule,
-    TypeOrmModule.forFeature([Camera, Scheduler,HistoryCamera]),
+    TypeOrmModule.forFeature([Camera, Scheduler,HistoryCamera,ChangedCamera]),
     ScheduleModule.forRoot()
   ],
   controllers: [
@@ -54,7 +56,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     SchedulerService,
     CronService,
     HistoryCameraService,
-    OnvifService
+    OnvifService,
+    ChangedCameraService
   ],
 })
 export class AppModule { }

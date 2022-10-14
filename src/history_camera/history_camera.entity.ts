@@ -19,7 +19,7 @@ export class HistoryCamera {
     @Column()
     manufacturer: string;
     @Column()
-    serialNumber: number;
+    serialNumber: string;
     @Column()
     hardwareId: string;
     @Column()

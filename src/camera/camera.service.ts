@@ -89,6 +89,14 @@ export class CameraService {
         return existingCamera;
     }
 
+    async getCameraWithIP(ipCamera: string): Promise<Camera> {
+        const existingCamera = await this.cemeraRepository.findOneBy({ ipCamera: ipCamera });
+        if (!existingCamera) {
+            throw new NotFoundException(`Camera ip : ${ipCamera} not found`);
+        }
+        return existingCamera;
+    }
+
     async deleteCamera(cameraId: number): Promise<void> {
         const deletedCamera = await this.cemeraRepository.findOneBy({ id: cameraId });
         if (!deletedCamera) {

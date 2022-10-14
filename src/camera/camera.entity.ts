@@ -19,7 +19,7 @@ export class Camera {
     @Column()
     manufacturer: string;
     @Column()
-    serialNumber: number;
+    serialNumber: string;
     @Column()
     hardwareId: string;
     @Column()

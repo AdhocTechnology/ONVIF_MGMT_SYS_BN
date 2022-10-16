@@ -23,12 +23,20 @@ export class HistoryCameraService {
                 newHistoryCamera = data;
                 newHistoryCamera.timeHr = timeHr.replace(/^0+/, '');
                 newHistoryCamera.timeMin = timeMin.replace(/^0+/, '');
+                newHistoryCamera.createAt = new Date();
                 this.historyCameraRepository.save(newHistoryCamera);
             } catch (error) {
                 console.log(error);
             }
         });
     }
+    async getAllHistoryCamera(filter?: object): Promise<HistoryCamera[]> {
+        const historyCameraData = await this.historyCameraRepository.find(filter);
+        if (!historyCameraData || historyCameraData.length == 0) {
+            throw new NotFoundException('History camera data not found!');
+        }
+        return historyCameraData;
 
+    }
 
 }

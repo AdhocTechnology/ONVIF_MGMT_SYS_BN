@@ -10,4 +10,5 @@ export class CreateCameraDto {
     readonly password: string;
 
     readonly warrantyExp: string;
+    
 }

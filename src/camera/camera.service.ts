@@ -59,11 +59,11 @@ export class CameraService {
 
 
     async clearStatus(): Promise<void> {
-        await this.cemeraRepository.update({}, {status:false});
+        await this.cemeraRepository.update({}, { status: false });
     }
 
-    async getAllCamera(): Promise<Camera[]> {
-        const cameraData = await this.cemeraRepository.find();
+    async getAllCamera(filter?: object): Promise<Camera[]> {
+        const cameraData = await this.cemeraRepository.find(filter);
         if (!cameraData || cameraData.length == 0) {
             throw new NotFoundException('Camera data not found!');
         }
@@ -73,7 +73,7 @@ export class CameraService {
     async getUsernamePasswordCamera(): Promise<Camera[]> {
         // username
         // password
-        
+
         const cameraData = await this.cemeraRepository.createQueryBuilder('c').select(['c.ipCamera', 'c.username', 'c.password']).getMany();
         if (!cameraData || cameraData.length == 0) {
             throw new NotFoundException('Camera data not found!');

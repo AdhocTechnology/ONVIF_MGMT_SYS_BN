@@ -32,5 +32,7 @@ export class HistoryCamera {
     timeHr?: string;
     @Column()
     timeMin?: string;
+    @Column()
+    createAt?: Date;
     
 }

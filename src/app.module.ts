@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { CameraSchema } from './schema/camera.schema';
 import { CameraService } from './camera/camera.service';
 import { CameraController } from './camera/camera.controller';
+import { ExportCsvController } from './exportCSV/export_csv.controller';
+import { ExportCsvService } from './exportCSV/export_csv.service';
 import { SchedulerController } from './scheduler/scheduler.controller';
 import { SchedulerService } from './scheduler/scheduler.service';
 import { SchedulerSchema } from './schema/scheduler.schema';
@@ -49,7 +51,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
   controllers: [
     AppController, CameraController,
     SchedulerController,
-    OnvifController
+    OnvifController,ExportCsvController
   ],
   providers: [
     AppService, CameraService,
@@ -57,7 +59,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     CronService,
     HistoryCameraService,
     OnvifService,
-    ChangedCameraService
+    ChangedCameraService,
+    ExportCsvService
   ],
 })
 export class AppModule { }

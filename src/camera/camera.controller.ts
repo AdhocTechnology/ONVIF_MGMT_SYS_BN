@@ -104,27 +104,27 @@ export class CameraController {
 
         // console.log(responseData);
 
-        // const responseDevices: IAllDevicesInfoResponse[] = responseData.devices;
-        // const responseTime = responseData.responseTime.toISOString();
+        const responseDevices: IAllDevicesInfoResponse[] = responseData.devices;
+        const responseTime = responseData.responseTime.toISOString();
         // mockData
-        const responseTime = new Date().toISOString();
-        const responseDevices: IAllDevicesInfoResponse[] = [{
-            manufacturer: 'Bosch',
-            model: 'DINION IP 4000i IR',
-            firmwareVersion: '6.60.0065',
-            serialNumber: 99999999999999999999998,
-            hardwareId: 'F000A043',
-            ipCamera: '192.168.1.255',
-            port: 80
-        }, {
-            manufacturer: 'Bosch',
-            model: 'DINION IP 4000i IR',
-            firmwareVersion: '6.60.0065',
-            serialNumber: 99999999999999999999997,
-            hardwareId: 'F000A043',
-            ipCamera: '192.255.255.12',
-            port: 80
-        }];
+        // const responseTime = new Date().toISOString();
+        // const responseDevices: IAllDevicesInfoResponse[] = [{
+        //     manufacturer: 'Bosch',
+        //     model: 'DINION IP 4000i IR',
+        //     firmwareVersion: '6.60.0065',
+        //     serialNumber: 99999999999999999999998,
+        //     hardwareId: 'F000A043',
+        //     ipCamera: '192.168.1.255',
+        //     port: 80
+        // }, {
+        //     manufacturer: 'Bosch',
+        //     model: 'DINION IP 4000i IR',
+        //     firmwareVersion: '6.60.0065',
+        //     serialNumber: 99999999999999999999997,
+        //     hardwareId: 'F000A043',
+        //     ipCamera: '192.255.255.12',
+        //     port: 80
+        // }];
 
         const allCameraIp = oldCameraData.map(x => x.ipCamera);
         const camerasConnected = responseDevices.filter(obj => allCameraIp.includes(obj.ipCamera));
@@ -172,7 +172,6 @@ export class CameraController {
         }
     }
 
-
     @Get('/:id')
     async getCamera(@Res() response, @Param('id') cameraId: number) {
         try {
@@ -199,4 +198,5 @@ export class CameraController {
             return response.status(err.status).json(err.response);
         }
     }
+
 }

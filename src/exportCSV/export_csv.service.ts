@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Camera } from '../camera/camera.entity';
 import { HistoryCamera } from '../history_camera/history_camera.entity';
 import * as fastcsv from 'fast-csv';
 import * as fs from 'fs';
 import * as moment from 'moment';
+import { join } from 'path';
 @Injectable()
 export class ExportCsvService {
     constructor(
@@ -29,14 +30,44 @@ export class ExportCsvService {
                 createAt: moment(camera.createAt, 'YYYY-MM-DD HH:mm:ss'),
             }
         });
-        fastcsv
-            .write(jsonData, { headers: true })
-            .on("finish", function () {
-                console.log("Write to CSV successfully!");
-            })
-            .pipe(ws);
-        return fileName;
+
+        if (!fs.existsSync('/exportCSVFile/current') || !fs.existsSync('/exportCSVFile/history')) {
+            if (!fs.existsSync('/exportCSVFile')) {
+                fs.mkdirSync("/exportCSVFile");
+            }
+            if (!fs.existsSync('/exportCSVFile/current')) {
+                fs.mkdirSync("/exportCSVFile/current");
+            }
+            if (!fs.existsSync('/exportCSVFile/history')) {
+                fs.mkdirSync("/exportCSVFile/history");
+            }
+        }
+
+        const writeCSV = await this.writeCSV(jsonData, ws);
+
+        if (writeCSV) {
+            return fileName;
+        }
+        throw new InternalServerErrorException("Cannot create CSV file.");
+
+
     }
+
+    async writeCSV(data, ws) {
+        return new Promise((resolve, reject) => {
+            let status = false;
+            fastcsv
+                .write(data, { headers: true })
+                .on("error", reject)
+                .on("finish", function () {
+                    console.log('Write to CSV successfully!');
+                    status = true;
+                    resolve(status);
+                })
+                .pipe(ws);
+        });
+    }
+
 
     async createHistoryCSV(historyCameraData: HistoryCamera[]): Promise<string> {
         const historyCamerasCSV = historyCameraData.map(camera => {

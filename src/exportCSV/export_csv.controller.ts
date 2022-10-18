@@ -12,14 +12,14 @@ import { ExportCsvService } from './export_csv.service';
 import { MGetAllDevicesInfo } from '../onvif/onvif.model';
 // import { InjectModel } from '@nestjs/mongoose';
 // import { Model } from 'mongoose';
-import { createReadStream } from 'fs';
+import * as fs from 'fs';
 import { join } from 'path';
 import { ICamera } from '../interface/camera.interface';
 import { Between } from 'typeorm';
 // import { Camera } from './camera.entity';
 
 // import { CronService } from '../cron/cron.service';
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('exportCSV')
 export class ExportCsvController {
     constructor(
@@ -51,9 +51,9 @@ export class ExportCsvController {
             const allHistoryCamera = await this.historyCameraService.getAllHistoryCamera(filter);
 
             const fileName = await this.exportCsvService.createHistoryCSV(allHistoryCamera);
-            console.log(join(process.cwd()+'/exportCSVFile/history/', fileName));
+            console.log(join(process.cwd() + '/exportCSVFile/history/', fileName));
 
-            return response.status(HttpStatus.OK).download(join(process.cwd()+'/exportCSVFile/history', fileName));
+            return response.status(HttpStatus.OK).download(join(process.cwd() + '/exportCSVFile/history', fileName));
         } catch (err) {
             return response.status(err.status).json(err.response);
         }
@@ -65,9 +65,11 @@ export class ExportCsvController {
         try {
             const allCamera = await this.cameraService.getAllCamera();
             const fileName = await this.exportCsvService.createCurrentCSV(allCamera);
-            console.log(join(process.cwd() + '/exportCSVFile/current/', fileName));
 
-            return response.status(HttpStatus.OK).download(join(process.cwd() + '/exportCSVFile/current', fileName));
+            const rs = fs.createReadStream("./exportCSVFile/current/"+ fileName);
+            response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+            rs.pipe(response);
+
         } catch (err) {
             return response.status(err.status).json(err.response);
         }

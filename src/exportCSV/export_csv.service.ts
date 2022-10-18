@@ -99,16 +99,39 @@ export class ExportCsvService {
             result.push(camera);
         });
 
+        if (!fs.existsSync('/exportCSVFile/current') || !fs.existsSync('/exportCSVFile/history')) {
+            if (!fs.existsSync('/exportCSVFile')) {
+                fs.mkdirSync("/exportCSVFile");
+            }
+            if (!fs.existsSync('/exportCSVFile/current')) {
+                fs.mkdirSync("/exportCSVFile/current");
+            }
+            if (!fs.existsSync('/exportCSVFile/history')) {
+                fs.mkdirSync("/exportCSVFile/history");
+            }
+        }
+
         const postfix = moment(new Date()).format('DD-MM-YYYY');
         const fileName = `historyCameraData_${postfix}.csv`;
         const ws = fs.createWriteStream("exportCSVFile/history/" + fileName);
-        fastcsv
-            .write(result, { headers: true })
-            .on("finish", function () {
-                console.log("Write to CSV successfully!");
-            })
-            .pipe(ws);
-        return fileName;
+
+        const writeCSV = await this.writeCSV(result, ws);
+
+        if (writeCSV) {
+            return fileName;
+        }
+        throw new InternalServerErrorException("Cannot create CSV file.");
+
+        // const postfix = moment(new Date()).format('DD-MM-YYYY');
+        // const fileName = `historyCameraData_${postfix}.csv`;
+        // const ws = fs.createWriteStream("exportCSVFile/history/" + fileName);
+        // fastcsv
+        //     .write(result, { headers: true })
+        //     .on("finish", function () {
+        //         console.log("Write to CSV successfully!");
+        //     })
+        //     .pipe(ws);
+        // return fileName;
     }
 
 }

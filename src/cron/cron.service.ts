@@ -56,9 +56,9 @@ export class CronService {
 
     async getAllScheduler(): Promise<Scheduler[]> {
         const schedulerData = await this.schedulerRepository.find();
-        if (!schedulerData || schedulerData.length == 0) {
-            throw new NotFoundException('Scheduler data not found!');
-        }
+        // if (!schedulerData || schedulerData.length == 0) {
+        //     throw new NotFoundException('Scheduler data not found!');
+        // }
         return schedulerData;
     }
 
@@ -104,27 +104,27 @@ export class CronService {
                 }
             }
 
-            // const responseDevices = responseData.devices;
-            // const responseTime = responseData.responseTime.toISOString();
+            const responseDevices = responseData.devices;
+            const responseTime = responseData.responseTime.toISOString();
             // mockData
-            const responseTime = new Date().toISOString();
-            const responseDevices: IAllDevicesInfoResponse[] = [{
-                manufacturer: 'Bosch',
-                model: 'DINION IP 4000i IR',
-                firmwareVersion: '6.60.0065',
-                serialNumber: 2222222,
-                hardwareId: 'F000A043',
-                ipCamera: '192.255.255.12',
-                port: 80
-            }, {
-                manufacturer: 'Bosch',
-                model: 'DINION IP 4000i IR',
-                firmwareVersion: '6.60.0065',
-                serialNumber: 33333333,
-                hardwareId: 'F000A043',
-                ipCamera: '192.168.1.4',
-                port: 81
-            }];
+            // const responseTime = new Date().toISOString();
+            // const responseDevices: IAllDevicesInfoResponse[] = [{
+            //     manufacturer: 'Bosch',
+            //     model: 'DINION IP 4000i IR',
+            //     firmwareVersion: '6.60.0065',
+            //     serialNumber: 2222222,
+            //     hardwareId: 'F000A043',
+            //     ipCamera: '192.255.255.12',
+            //     port: 80
+            // }, {
+            //     manufacturer: 'Bosch',
+            //     model: 'DINION IP 4000i IR',
+            //     firmwareVersion: '6.60.0065',
+            //     serialNumber: 33333333,
+            //     hardwareId: 'F000A043',
+            //     ipCamera: '192.168.1.4',
+            //     port: 81
+            // }];
             const allCameraIp = oldCameraData.map(x => x.ipCamera);
             const camerasConnected = responseDevices.filter(obj => allCameraIp.includes(obj.ipCamera));
             await this.cameraService.clearStatus();

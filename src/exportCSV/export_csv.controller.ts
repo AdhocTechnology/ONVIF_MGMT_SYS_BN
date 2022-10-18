@@ -49,11 +49,11 @@ export class ExportCsvController {
             };
 
             const allHistoryCamera = await this.historyCameraService.getAllHistoryCamera(filter);
-
             const fileName = await this.exportCsvService.createHistoryCSV(allHistoryCamera);
-            console.log(join(process.cwd() + '/exportCSVFile/history/', fileName));
+            const rs = fs.createReadStream("./exportCSVFile/history/"+ fileName);
+            response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+            rs.pipe(response);
 
-            return response.status(HttpStatus.OK).download(join(process.cwd() + '/exportCSVFile/history', fileName));
         } catch (err) {
             return response.status(err.status).json(err.response);
         }
@@ -65,7 +65,6 @@ export class ExportCsvController {
         try {
             const allCamera = await this.cameraService.getAllCamera();
             const fileName = await this.exportCsvService.createCurrentCSV(allCamera);
-
             const rs = fs.createReadStream("./exportCSVFile/current/"+ fileName);
             response.setHeader("Content-Disposition", "attachment; filename="+fileName);
             rs.pipe(response);

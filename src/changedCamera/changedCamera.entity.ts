@@ -4,33 +4,61 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class ChangedCamera {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     ipCamera: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldModel: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldManufacturer: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldSerialNumber: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldHardwareId: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldFirmwareVersion: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     oldPort?: number;
 
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newModel: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newManufacturer: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newSerialNumber: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newHardwareId: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newFirmwareVersion: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     newPort?: number;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     createAt: string;
 }

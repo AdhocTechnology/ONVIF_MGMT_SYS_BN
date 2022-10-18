@@ -10,24 +10,44 @@ export class Camera {
     username: string;
     @Column()
     password: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     warrantyExp: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     status: boolean;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     model: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     manufacturer: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     serialNumber: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     hardwareId: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     firmwareVersion: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     port?: number;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     responseTime?: string;
-    @Column()
+    @Column({
+        nullable: true,
+    })
     createAt: string;
 }

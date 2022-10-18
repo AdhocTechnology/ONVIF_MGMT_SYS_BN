@@ -40,9 +40,9 @@ export class SchedulerService {
     }
     async getAllScheduler(): Promise<Scheduler[]> {
         const schedulerData = await this.schedulerRepository.find();
-        if (!schedulerData || schedulerData.length == 0) {
-            throw new NotFoundException('Scheduler data not found!');
-        }
+        // if (!schedulerData || schedulerData.length == 0) {
+        //     throw new NotFoundException('Scheduler data not found!');
+        // }
         return schedulerData;
     }
     async getScheduler(schedulerId: number): Promise<Scheduler> {

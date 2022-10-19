@@ -1,17 +1,13 @@
-import { Injectable, NotFoundException, OnModuleInit, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { HistoryCameraService } from '../history_camera/history_camera.service';
 import { CameraService, NUMBER_OF_LOOP_CHECKING } from '../camera/camera.service';
 
 import { CronJob } from 'cron';
-import { Model } from 'mongoose';
-import { IScheduler } from '../interface/scheduler.interface';
 import { MGetAllDevicesInfo } from '../onvif/onvif.model';
 import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/onvif.interface';
 import { OnvifService } from '../onvif/onvif.service';
 import { ChangedCameraService } from '../changedCamera/changedCamera.service';
-import { ICamera } from '../interface/camera.interface';
 import { Scheduler } from '../scheduler/scheduler.entity';
 import { Camera } from '../camera/camera.entity';
 import { Repository } from 'typeorm';
@@ -35,7 +31,6 @@ export class CronService {
     async setupAllCrons() {
         const SchedulerArr = await this.getAllScheduler();
         SchedulerArr.forEach((element, i) => {
-            // console.log(`count ${i}`);
             this.addCronJob(element.id, element.timeHr, element.timeMin);
         });
     }
@@ -56,9 +51,6 @@ export class CronService {
 
     async getAllScheduler(): Promise<Scheduler[]> {
         const schedulerData = await this.schedulerRepository.find();
-        // if (!schedulerData || schedulerData.length == 0) {
-        //     throw new NotFoundException('Scheduler data not found!');
-        // }
         return schedulerData;
     }
 

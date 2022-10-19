@@ -4,7 +4,6 @@ import { HistoryCamera } from '../history_camera/history_camera.entity';
 import * as fastcsv from 'fast-csv';
 import * as fs from 'fs';
 import * as moment from 'moment';
-import { join } from 'path';
 @Injectable()
 export class ExportCsvService {
     constructor(
@@ -122,16 +121,6 @@ export class ExportCsvService {
         }
         throw new InternalServerErrorException("Cannot create CSV file.");
 
-        // const postfix = moment(new Date()).format('DD-MM-YYYY');
-        // const fileName = `historyCameraData_${postfix}.csv`;
-        // const ws = fs.createWriteStream("exportCSVFile/history/" + fileName);
-        // fastcsv
-        //     .write(result, { headers: true })
-        //     .on("finish", function () {
-        //         console.log("Write to CSV successfully!");
-        //     })
-        //     .pipe(ws);
-        // return fileName;
     }
 
 }

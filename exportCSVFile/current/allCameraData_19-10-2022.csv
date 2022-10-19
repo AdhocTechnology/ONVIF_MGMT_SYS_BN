@@ -1,0 +1,3 @@
+ipCamera,username,password,warrantyExp,model,manufacturer,serialNumber,hardwareId,firmwareVersion,port,status,responseTime,createAt
+192.168.1.116,service,,,FLEXIDOME IP 4000i IR,Bosch,094454807340592015,F0009643,7.60.0118,80,true,Tue Oct 18 2022 16:36:27 GMT+0700,Tue Oct 18 2022 14:11:39 GMT+0700
+192.168.1.118,service,,,DINION IP 4000i IR,Bosch,404516907622012160,F000A043,6.60.0065,80,true,Tue Oct 18 2022 16:36:27 GMT+0700,Tue Oct 18 2022 16:28:30 GMT+0700

@@ -7,13 +7,7 @@ import { IAllDevicesInfoResponse, IAllDevicesResponseWithTime } from '../onvif/o
 import { OnvifService } from '../onvif/onvif.service';
 import { ChangedCameraService } from '../changedCamera/changedCamera.service';
 import { MGetAllDevicesInfo } from '../onvif/onvif.model';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { Model } from 'mongoose';
-import { ICamera } from '../interface/camera.interface';
-
 import { Camera } from './camera.entity';
-
-// import { CronService } from '../cron/cron.service';
 @UseGuards(JwtAuthGuard)
 @Controller('camera')
 export class CameraController {
@@ -21,8 +15,6 @@ export class CameraController {
         private readonly cameraService: CameraService,
         private readonly onvifService: OnvifService,
         private readonly changedCameraService: ChangedCameraService,
-        // @InjectModel('camera_data') private cameraModel: Model<ICamera>,
-        // private readonly cronService: CronService,
     ) {
 
     }
@@ -56,10 +48,7 @@ export class CameraController {
 
     @Get()
     async getAllCamera(@Res() response) {
-        // const oldCameraData = await this.cameraService.getAllCamera();
-
         const oldCameraData: MGetAllDevicesInfo[] = await this.cameraService.getUsernamePasswordCamera();
-        // console.log(oldCameraData);
 
         const devicesPromise: Promise<IAllDevicesInfoResponse[]>[] = [];
         let devices: IAllDevicesInfoResponse[] = [];
@@ -101,8 +90,6 @@ export class CameraController {
                 responseTime: new Date()
             }
         }
-
-        // console.log(responseData);
 
         const responseDevices: IAllDevicesInfoResponse[] = responseData.devices;
         const responseTime = responseData.responseTime.toISOString();
@@ -192,7 +179,6 @@ export class CameraController {
             const deletedCamera = await this.cameraService.deleteCamera(cameraId);
             return response.status(HttpStatus.OK).json({
                 message: 'Camera deleted successfully',
-                // deletedCamera,
             });
         } catch (err) {
             return response.status(err.status).json(err.response);

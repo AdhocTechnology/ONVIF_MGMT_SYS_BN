@@ -11,5 +11,3 @@ export class MGetConnectionStatus implements IGetAllDevicesInfo {
     password: string;
     username: string;
 }
-
-//Todo validate

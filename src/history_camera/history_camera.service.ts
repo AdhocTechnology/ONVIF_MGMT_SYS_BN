@@ -1,9 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from "mongoose";
-import { IHistoryCamera } from 'src/interface/history_camera.interface';
-import { CreateHistoryCameraDto } from 'src/dto/create-history_camera.dto';
-import { ICamera } from 'src/interface/camera.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HistoryCamera } from './history_camera.entity';
 import { Camera } from '../camera/camera.entity';
 import { Repository } from 'typeorm';

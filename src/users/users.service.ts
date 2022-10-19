@@ -14,9 +14,7 @@ export class UsersService {
         user.password = password;
         return this.usersRepository.save(user);
     }
-    // async getUser(query: object ): Promise<User> {
-    //     return this.userModel.findOne(query);
-    // }
+   
     getUser(username: string): Promise<User> {
         return this.usersRepository.findOneBy({ username: username });
     }

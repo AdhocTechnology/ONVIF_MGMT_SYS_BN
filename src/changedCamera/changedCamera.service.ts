@@ -1,5 +1,4 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import {  Injectable } from '@nestjs/common';
 import { CreateChangedCameraDto } from '../dto/create-changed_camera.dto';
 import { ChangedCamera } from './changedCamera.entity';
 import { Repository } from 'typeorm';

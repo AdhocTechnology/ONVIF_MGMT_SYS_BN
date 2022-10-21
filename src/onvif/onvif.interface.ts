@@ -7,7 +7,8 @@ export interface IGetAllDevicesInfo {
 export interface IAllDevicesInfoResponse {
     manufacturer: string;
     model: string;
-    serialNumber: number | string;
+    // serialNumber: number | string;
+    serialNumber: string;
     hardwareId: string;
     firmwareVersion: string;
     ipCamera?: string;

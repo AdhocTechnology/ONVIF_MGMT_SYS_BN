@@ -20,7 +20,7 @@ export class ExportCsvService {
                 warrantyExp: camera.warrantyExp,
                 model: camera.model,
                 manufacturer: camera.manufacturer,
-                serialNumber: camera.serialNumber,
+                serialNumber: camera.serialNumber+'\n',
                 hardwareId: camera.hardwareId,
                 firmwareVersion: camera.firmwareVersion,
                 port: camera.port,
@@ -56,7 +56,7 @@ export class ExportCsvService {
         return new Promise((resolve, reject) => {
             let status = false;
             fastcsv
-                .write(data, { headers: true })
+                .write(data, { headers: true, })
                 .on("error", reject)
                 .on("finish", function () {
                     console.log('Write to CSV successfully!');
@@ -77,7 +77,7 @@ export class ExportCsvService {
                 warrantyExp: camera.warrantyExp,
                 model: camera.model,
                 manufacturer: camera.manufacturer,
-                serialNumber: camera.serialNumber,
+                serialNumber: camera.serialNumber+'\n',
                 hardwareId: camera.hardwareId,
                 firmwareVersion: camera.firmwareVersion,
                 port: camera.port,

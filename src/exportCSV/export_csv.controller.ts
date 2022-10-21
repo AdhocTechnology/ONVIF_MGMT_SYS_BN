@@ -56,7 +56,6 @@ export class ExportCsvController {
             const allCamera = await this.cameraService.getAllCamera();
             const fileName = await this.exportCsvService.createCurrentCSV(allCamera);
 
-
             const file = fs.createReadStream(join(process.cwd() + '/exportCSVFile/current', fileName));
 
 

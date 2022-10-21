@@ -30,6 +30,7 @@ export class OnvifService {
             if (!isReject) {
                 camInfo.ipCamera = body[i].ipCamera;
                 camInfo.port = DEFAULT_PORT;
+                camInfo.serialNumber = camInfo.serialNumber.toString();
                 devicesInfo.push(camInfo);
             }
         }

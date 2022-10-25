@@ -25,8 +25,8 @@ export class ExportCsvService {
                 firmwareVersion: camera.firmwareVersion,
                 port: camera.port,
                 status: camera.status,
-                responseTime: moment(camera.responseTime, 'YYYY-MM-DD HH:mm:ss'),
-                createAt: moment(camera.createAt, 'YYYY-MM-DD HH:mm:ss'),
+                responseTime: new Date(camera.responseTime).toLocaleString('th-TH'),
+                createAt: new Date(camera.createAt).toLocaleString('th-TH'),
             }
         });
 
@@ -82,8 +82,8 @@ export class ExportCsvService {
                 firmwareVersion: camera.firmwareVersion,
                 port: camera.port,
                 status: camera.status,
-                responseTime: moment(camera.responseTime).format('YYYY-MM-DD HH:mm:ss'),
-                createAt: moment(camera.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                responseTime: new Date(camera.responseTime).toLocaleString('th-TH'),
+                createAt: new Date(camera.createAt).toLocaleString('th-TH'),
             }
         });
 

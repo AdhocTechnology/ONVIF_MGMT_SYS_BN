@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { HistoryCamera } from './history_camera.entity';
 import { Camera } from '../camera/camera.entity';
-import { Repository } from 'typeorm';
+import { Repository, LessThanOrEqual } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class HistoryCameraService {
     constructor(
         @InjectRepository(HistoryCamera)
         private readonly historyCameraRepository: Repository<HistoryCamera>
-    ) { }
+    ) {
+    }
     async createHistoryCamera(historyCameraData: Camera[], timeHr: string, timeMin: string): Promise<void> {
 
         historyCameraData.forEach((camera, i) => {
@@ -32,6 +33,15 @@ export class HistoryCameraService {
         }
         return historyCameraData;
 
+    }
+
+    async clearOldData(): Promise<void> {
+        const threeMonthAgoDate = new Date();
+        threeMonthAgoDate.setMonth(threeMonthAgoDate.getMonth() - 3);
+        await this.historyCameraRepository.createQueryBuilder()
+            .delete()
+            .where("createAt <= :date", { date: threeMonthAgoDate })
+            .execute()
     }
 
 }

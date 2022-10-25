@@ -33,6 +33,7 @@ export class CronService {
         SchedulerArr.forEach((element, i) => {
             this.addCronJob(element.id, element.timeHr, element.timeMin);
         });
+        this.addCronClearHistory()
     }
 
     getAllCronsId() {
@@ -162,6 +163,22 @@ export class CronService {
         }
 
         console.log(`job ${_id} added !(${hour}:${min})`);
+        job.start();
+    }
+
+    addCronClearHistory(){
+        // const job = new CronJob(`0 58 23 * * *`, async () => {
+        const job = new CronJob(`0 58 23 * * *`, async () => {
+            console.log('clear old data');
+            this.historyCameraService.clearOldData();
+        })
+        try {
+            this.schedulerRegistry.addCronJob('clearHistory', job);
+        } catch (error) {
+            console.log(error);
+        }
+
+        console.log(`job clear history added !(23:58)`);
         job.start();
     }
 

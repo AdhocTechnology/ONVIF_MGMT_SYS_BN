@@ -3,7 +3,7 @@ import { Cam } from 'onvif';
 import { IAllDevicesInfoResponse, IGetAllDevicesInfo } from "./onvif.interface";
 
 export const DEFAULT_PORT: number = 80;
-export const DEFAULT_TIMEOUT: number = 1000;
+export const DEFAULT_TIMEOUT: number = 2000;
 
 @Injectable()
 export class OnvifService {

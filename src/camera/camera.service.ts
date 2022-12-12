@@ -4,6 +4,7 @@ import { UpdateCameraDto } from '../dto/update-camera.dto';
 import { Camera } from './camera.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { GetCameraDto } from 'src/dto/get-camera.dto';
 export const NUMBER_OF_LOOP_CHECKING: number = 3;
 
 @Injectable()
@@ -30,7 +31,7 @@ export class CameraService {
     }
 
     async updateCamera(cameraId: number, updateCameraDto: UpdateCameraDto): Promise<Camera> {
-        const existingCamera = await this.cemeraRepository.findOne({ where :{id: cameraId} });
+        const existingCamera = await this.cemeraRepository.findOne({ where: { id: cameraId } });
         if (!existingCamera) {
             throw new NotFoundException(`camera #${cameraId} not found`);
         }
@@ -58,9 +59,44 @@ export class CameraService {
         return cameraData;
     }
 
+    async getCameraPagination(getCameraDto: GetCameraDto): Promise<Camera[]> {
+        const [result] = await this.cemeraRepository.findAndCount(
+            {
+                take: getCameraDto.take,
+                skip: getCameraDto.skip
+            }
+        );
+        return result
+    }
+
+
+
     async getUsernamePasswordCamera(): Promise<Camera[]> {
-        const cameraData = await this.cemeraRepository.createQueryBuilder('c').select(['c.ipCamera', 'c.username', 'c.password']).getMany();
-        return cameraData;
+        const cameraData = await this.cemeraRepository.find(
+            {
+                select: {
+                    ipCamera: true,
+                    username: true,
+                    password: true,
+                }
+            }
+        );
+        return cameraData
+    }
+
+    async getSomeUsernamePasswordCamera(getCameraDto: GetCameraDto): Promise<Camera[]> {
+        const result = await this.cemeraRepository.find(
+            {
+                select: {
+                    ipCamera: true,
+                    username: true,
+                    password: true,
+                },
+                take: getCameraDto.take,
+                skip: getCameraDto.skip
+            }
+        );
+        return result
     }
 
     async getCamera(cameraId: number): Promise<Camera> {

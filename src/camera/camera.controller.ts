@@ -228,7 +228,7 @@ export class CameraController {
         try {
             const cameraData = await this.cameraService.getCameraPagination(getCameraDto);
             return response.status(HttpStatus.OK).json({
-                message: 'Camera data found successfully', cameraData,
+                message: 'Camera data found successfully', hits: cameraData.count, cameraData: cameraData.data,
             });
         } catch (err) {
             return response.status(err.status).json(err.response);

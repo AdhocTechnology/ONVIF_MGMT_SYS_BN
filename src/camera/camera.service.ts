@@ -59,14 +59,15 @@ export class CameraService {
         return cameraData;
     }
 
-    async getCameraPagination(getCameraDto: GetCameraDto): Promise<Camera[]> {
-        const [result] = await this.cemeraRepository.findAndCount(
+    async getCameraPagination(getCameraDto: GetCameraDto): Promise<any> {
+        const [result,total] = await this.cemeraRepository.findAndCount(
             {
                 take: getCameraDto.take,
                 skip: getCameraDto.skip
             }
         );
-        return result
+        
+        return {data:result,count:total}
     }
 
 
